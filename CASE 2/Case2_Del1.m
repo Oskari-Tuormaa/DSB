@@ -1,11 +1,10 @@
 %% Case 2
 load('Opgave2_audiofil.mat');
 
-% fs found in opgavebeskrivelsen
-fs = 25600;
-x = raw_input;
+fs = 25600; % fs found in opgavebeskrivelsen
+x = raw_input; % Rename variable to fit convention
 y = x(1:fs*10); %Isolate first 10 seconds
-dc = mean(y);
+dc = mean(y); % Find DC-offset
 y = y - dc; % Remove DC-offset to clean up signal
 N = length(y);
 
@@ -13,7 +12,8 @@ figure(5)
 plot((0:N-1) / fs, y);
 title('Opgave2\_audiofil.mat')
 xlabel('Time [s]')
-ylabel('Amplitude')
+ylabel('Amplitude [V]')
+grid on
 
 Y = fft(y);
 
@@ -71,14 +71,13 @@ energy = sum(abs(y).^2)
 energy = sum(abs(Y).^2)/N
 
 %%
-% Energien frekvens og tidsdomæne er det samme, kig evt. på Parsevals
-f_res = fs/length(y);
+f_res = fs/fs;
 % Calculate the bin in which 40 Hz is represented
 cutoff_bin = 40/f_res
 
 % Split data in two parts around cutoff_bin
-Y_lo = Y(1:cutoff_bin);
-Y_hi = Y(cutoff_bin:end);
+Y_lo = Y(1:40);
+Y_hi = Y(40:end);
 
 % Calculate lo and hi frequency energy
 energy_lo = sum(abs(Y_lo).^2)/N
