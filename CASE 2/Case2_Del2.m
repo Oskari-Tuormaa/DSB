@@ -72,3 +72,14 @@ ylabel('Amplitude [dBV]');
 legend('Smoothed', 'Original')
 xlim([4100, 4200]);
 grid on
+
+% Lin over log
+figure(11)
+stem(abs(Y_han_smooth_raw), 'Marker', 'none');
+title('DFT of Y\_han\_smooth\_raw [Lin/Log]');
+set(gca, 'xscal', 'log');
+xlabel('Frekvens [Hz]');
+ylabel('Amplitude [V]');
+%ylim([0, 1]);
+xlim([30, fs/2]);
+grid on
