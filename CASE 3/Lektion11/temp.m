@@ -19,7 +19,7 @@ if filtord(b,a) == wanted_order
     title('Butterworth filterkarakteristik');
 end
 
-%% Opgave 3.13
+%% Opgave 3.14
 
 clear
 close all
@@ -45,7 +45,9 @@ z_transform = c2d(laplace,Ts)
 b = [1,-0.634];
 a = [1,-0.3898];
 
+%Vis frekvensresponsen for H(z) vha. freqz.m i Matlab
 % Tegn filter
+figure(101);
 freqz(b,a)
 title('Shelf filter frekvensrespons');
 
@@ -53,8 +55,10 @@ title('Shelf filter frekvensrespons');
 nulpunkter = roots([1,-0.634]);
 poler = roots([1,-0.3898]);
 
+figure(102);
 zplane(nulpunkter, poler);
 %Filtret er stabilt da alle poler er inden for enhedscirklen. Dvs. mellem
 %-1 og 1.
 
 %Find differensligningen der repræsenterer H(z), altså y(n) = ... 
+% Er det en invfft her??
