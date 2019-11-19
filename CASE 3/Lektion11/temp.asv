@@ -22,9 +22,6 @@ end
 figure(102);
 grpdelay(b,a);
 
-gd = grpdelay(b,a);
-max(gd)
-
 %% Opgave 3.14
 
 clear
