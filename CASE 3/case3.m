@@ -87,9 +87,9 @@ xlabel("Frekvens [Hz]")
 ylabel("Gain [dB]")
 
 % Kør signalet gennem filteret så at sige
-w_net = conv(s, h_lo./f_lo_bin);
+Y_net = conv(s, h_lo./f_lo_bin);
 figure()
-plot(w_net)
+plot(Y_net)
 hold on
 plot(s)
 legend(["Filtreret" "Original"])
@@ -139,9 +139,9 @@ xlabel("Frekvens [Hz]")
 ylabel("Gain [dB]")
 
 % Kør signalet gennem filteret så at sige
-w_net = conv(s, h_lo./f_lo_bin);
+Y_lo = conv(s, h_lo./f_lo_bin);
 figure()
-plot(w_net)
+plot(Y_lo)
 hold on
 plot(s)
 legend(["Filtreret" "Original"])
@@ -163,12 +163,12 @@ stem(h_net)
 figure()
 freqz(h_net, 1, 512, fs)
 
-w_net = conv(s, h_net, 'same');
-N_net = length(w_net);
+Y_net = conv(s, h_net, 'same');
+N_net = length(Y_net);
 
 figure()
 subplot(2, 1, 1)
-plot(w_net)
+plot(Y_net)
 xlim([22500 26500])
 title("Sampleplot - Filtreret")
 xlabel("Samples")
@@ -178,7 +178,7 @@ plot(s)
 xlim([22500 26500])
 title("Sampleplot - Original")
 
-W_net = fft(w_net);
+Y_net = fft(Y_net);
 
 figure()
 subplot(2, 1, 1)
@@ -188,7 +188,7 @@ ylabel("Amplitude [dB]")
 xlabel("Frekvens [Hz]")
 xlim([30 70])
 subplot(2, 1, 2)
-plot(f_axis, 20*log10(abs(W_net)/N_net))
+plot(f_axis, 20*log10(abs(Y_net)/N_net))
 title("Filtreret")
 ylabel("Amplitude [dB]")
 xlabel("Frekvens [Hz]")
@@ -199,15 +199,86 @@ close all
 
 f_hi = 150;
 
-f_hi_norm = 2 * f_hi / fs
+f_hi_norm = 2 * f_hi / fs;
 
-[b,a] = butter(16, f_hi_norm);
-[h, w] = freqz(b,a, 512, fs);
+[b,a] = butter(6, f_hi_norm);
 
 figure(1)
 freqz(b, a, 512, fs);
 title("Overføringskarakteristik for lavpasfilter, Fc = 150, M = 16")
 
-H = fftshift(real(ifft(h)));
+d = [0 0 0 0 1 zeros(1,N/2)];
+h_hi = filter(b,a,d);
+figure(2)
+plot(h_hi)
+xlim([0 200]) %<<<---- Zoomet ind på x-aksen!!!! Fra 0 til 200!!!!!!!!!!!!!!!!!!
+title("Impulsrespons for lavpasfilter")
+xlabel("Samples")
+ylabel("Amplitude")
 
-%% Lavfrekvent - 
+Y = conv(s, h_hi);
+
+figure(3)
+subplot(4, 1, 1)
+plot(Y)
+title("Filtreret")
+xlim([0 60000])
+subplot(4, 1, 2)
+plot(s)
+title("Original")
+subplot(4, 1, 3)
+plot(Y)
+xlim([30000 32000])
+title("Filtreret (Zoomet ind)")
+subplot(4, 1, 4)
+plot(s)
+xlim([30000 32000])
+title("Original (Zoomet ind)")
+
+
+
+
+%% Lavfrekvent - Højpas
+close all
+
+f_lo = 0.25;
+
+f_lo_norm = 2 * f_lo / fs;
+
+[b,a] = butter(2, f_lo_norm, 'high');
+
+figure(1)
+freqz(b, a, 10*2048, fs);
+title("Overføringskarakteristik for lavpasfilter, Fc = 150, M = 16")
+
+d = [0 0 0 0 1 zeros(1,N/2)];
+h_lo = filter(b,a,d);
+figure(2)
+plot(h_lo)
+xlim([0 20]) %<<<---- Zoomet ind på x-aksen!!!! Fra 0 til 200!!!!!!!!!!!!!!!!!!
+title("Impulsrespons for lavpasfilter")
+xlabel("Samples")
+ylabel("Amplitude")
+
+Y = conv(s, h_lo);
+
+figure(3)
+subplot(2, 1, 1)
+plot(Y)
+xlim([0 55000])
+title("Filtreret")
+subplot(2, 1, 2)
+plot(s)
+xlim([0 55000])
+title("Original")
+
+%% Lav filtrering på signalet
+close all
+
+% Fjern lavfrekvent
+Y = conv(s, h_lo .* h_net .* h_hi);
+
+figure(1)
+plot(Y)
+
+
