@@ -9,7 +9,7 @@ fc_high = 4000;
 
 % Design the filter
 % Since it is bandpass, the a
-[b,a] = butter(wanted_order/2,[fc_low fc_high]/fs,'bandpass');
+[b,a] = butter(wanted_order/2,[fc_low fc_high]/(fs/2),'bandpass');
 
 % Verify order
 if filtord(b,a) == wanted_order
@@ -18,6 +18,12 @@ if filtord(b,a) == wanted_order
     freqz(b,a);
     title('Butterworth filterkarakteristik');
 end
+
+figure(102);
+grpdelay(b,a);
+
+gd = grpdelay(b,a);
+max(gd)
 
 %% Opgave 3.14
 
