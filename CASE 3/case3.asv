@@ -148,51 +148,29 @@ hold off
 %% Netstøj - FIR - Båndstop
 close all
 
-f_net_hi = 55; % Cutoff frekvens
-f_net_lo = 45;
-M_net = 1024; % Orden
-f_net_res = fs / M_net; % Frekvensopløsning af filter
+f_net_lo = 40;
+f_net_hi = 60;
 
-f_net_bin_hi = round(f_net_hi / f_net_res) % Cutoff frekvens i bin
-f_net_bin_lo = round(f_net_lo / f_net_res) % Cutoff frekvens i bin
+f_net_lo_norm = 2 * f_net_lo / fs;
+f_net_hi_norm = 2 * f_net_hi / fs;
 
-% Skab filterets overføringskarakteristik i frekvensdomænet.
-% Da filtret er lavpas, sættes 1'er ind på hvert bin under
-% cutoff frekvensen, og 0'er sættes ind på hvert bin
-% over cutoff frekvensen.
-H_net = [ones([1 f_net_bin_lo]) zeros([1 f_net_bin_hi - f_net_bin_lo]) ones([1 M_net/2 - f_net_bin_hi])];
-stem(H_net)
+h_net = fir1(512, [f_net_lo_norm f_net_hi_norm], 'stop');
+stem(h_net)
 
-% Spejl filteret omkring nyquist, dvs. det sidste bin.
-H_net = [H_net fliplr(H_net)];
 figure()
-stem(H_net)
+freqz(h_net, 1, 512, fs)
 
-% Brug ifft til at omregne filteret til tidsdomænet for at se
-% impulsrespons
-h_ = fftshift(real(ifft(H_net)));
-figure()
-plot(h_net)
-
-% Lav fft på impulsresponset for at finde den reele overførings-
-% karakteristik.
-N_net_fft = fs; % Punkter i fft
-f_net_x = (0:N_net_fft-1) * fs / N_net_fft; % x-aksen
-
-h_net = abs(fft(h_net, N_net_fft));
-figure()
-plot(f_net_x, 20*log10(h_net))
-title("Fc = 150 Hz, M = 512")
-%xlim([0 400])
-%ylim([-100 10])
-xlabel("Frekvens [Hz]")
-ylabel("Gain [dB]")
-
-% Kør signalet gennem filteret så at sige
-w_net = conv(s, h_net./f_net_bin);
+w_net = conv(s, h_net, 'same');
 figure()
 plot(w_net)
 hold on
 plot(s)
-legend(["Filtreret" "Original"])
 hold off
+
+W_net = fft(w_net);
+
+figure()
+subplot(1, 2, 1)
+plot(f_axis, abs(W_net))
+%plot(f_axis, abs(S))
+xlim([30 70])

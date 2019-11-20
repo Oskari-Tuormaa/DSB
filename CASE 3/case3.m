@@ -40,7 +40,8 @@ ylabel('Amplitude')
 title('Sample-plot af signalet')
 % Her ser vi blot signalet tegnet direkte.
 
-%% Højfrekvent - FIR - Lavpas
+%% ************* Højfrekvent - FIR - Lavpas *************
+% *******************************************************
 close all
 
 f_lo = 150; % Cutoff frekvens
@@ -94,10 +95,11 @@ plot(s)
 legend(["Filtreret" "Original"])
 hold off
 
-%% Lavfrekvent - FIR - Højpas
+%% ************* Lavfrekvent - FIR - Højpas *************
+% *******************************************************
 close all
 
-f_lo = 2; % Cutoff frekvens
+f_lo = 0.05; % Cutoff frekvens
 M_lo = 2048; % Orden
 f_lo_res = fs / M_lo; % Frekvensopløsning af filter
 
@@ -145,17 +147,67 @@ plot(s)
 legend(["Filtreret" "Original"])
 hold off
 
-%% Netstøj - FIR - Båndstop
+%% ************* Netstøj - FIR - Båndstop *************
+% *****************************************************
 close all
 
-f_net_lo = 45;
-f_net_hi = 55;
+f_net_lo = 47;
+f_net_hi = 53;
 
 f_net_lo_norm = 2 * f_net_lo / fs;
 f_net_hi_norm = 2 * f_net_hi / fs;
 
-h_net = fir1(512, [f_net_lo_norm f_net_hi_norm], 'stop');
+h_net = fir1(1024, [f_net_lo_norm f_net_hi_norm], 'stop');
 stem(h_net)
 
-freqz(h_net, 1, 512, fs);
+figure()
+freqz(h_net, 1, 512, fs)
 
+w_net = conv(s, h_net, 'same');
+N_net = length(w_net);
+
+figure()
+subplot(2, 1, 1)
+plot(w_net)
+xlim([22500 26500])
+title("Sampleplot - Filtreret")
+xlabel("Samples")
+ylabel("Amplitude")
+subplot(2, 1, 2)
+plot(s)
+xlim([22500 26500])
+title("Sampleplot - Original")
+
+W_net = fft(w_net);
+
+figure()
+subplot(2, 1, 1)
+plot(f_axis, 20*log10(abs(S)/N))
+title("Original")
+ylabel("Amplitude [dB]")
+xlabel("Frekvens [Hz]")
+xlim([30 70])
+subplot(2, 1, 2)
+plot(f_axis, 20*log10(abs(W_net)/N_net))
+title("Filtreret")
+ylabel("Amplitude [dB]")
+xlabel("Frekvens [Hz]")
+xlim([30 70])
+
+%% Højfrekvent - Lavpas - IIR
+close all
+
+f_hi = 150;
+
+f_hi_norm = 2 * f_hi / fs
+
+[b,a] = butter(16, f_hi_norm);
+[h, w] = freqz(b,a, 512, fs);
+
+figure(1)
+freqz(b, a, 512, fs);
+title("Overføringskarakteristik for lavpasfilter, Fc = 150, M = 16")
+
+H = fftshift(real(ifft(h)));
+
+%% Lavfrekvent - 
