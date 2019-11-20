@@ -56,9 +56,12 @@ f_lo_bin = round(f_lo / f_lo_res); % Cutoff frekvens i bin
 % cutoff frekvensen, og 0'er sættes ind på hvert bin
 % over cutoff frekvensen.
 H_lo = [ones([1 f_lo_bin]) zeros([1 M_lo/2 - f_lo_bin])];
+stem(H_lo)
 
 % Spejl filteret omkring nyquist, dvs. det sidste bin.
 H_lo = [H_lo fliplr(H_lo)];
+figure()
+stem(H_lo)
 
 % Brug ifft til at omregne filteret til tidsdomænet for at se
 % impulsrespons
@@ -218,20 +221,20 @@ Y = conv(s, h_hi);
 
 figure(3)
 subplot(4, 1, 1)
-plot(s)
-title("Original")
-subplot(4, 1, 2)
 plot(Y)
 title("Filtreret")
 xlim([0 60000])
-subplot(4, 1, 3)
+subplot(4, 1, 2)
 plot(s)
-xlim([30000 32000])
-title("Original (Zoomet ind)")
-subplot(4, 1, 4)
+title("Original")
+subplot(4, 1, 3)
 plot(Y)
 xlim([30000 32000])
 title("Filtreret (Zoomet ind)")
+subplot(4, 1, 4)
+plot(s)
+xlim([30000 32000])
+title("Original (Zoomet ind)")
 
 
 
@@ -290,71 +293,33 @@ Y_3 = Y_3(1:length(s));
 Y_4 = conv(Y_3, h_hi);
 Y_4 = Y_4(1:length(s));
 
-
 figure()
 subplot(2, 1, 1)
 plot(Y_0)
-title("Sampleplot      Original")
-xlabel("Samples")
-ylabel("Amplitude")
-subplot(2, 1, 2)
-semilogx(f_axis, abs(fft(Y_0))/N)
-xlim([0 fs/2])
-title("Frekvensrespons      Original")
-xlabel("Frekvens [Hz]")
-ylabel("Amplitude [dB]")
 
 figure()
-subplot(2, 1, 1)
+subplot(5, 1, 1)
+plot(Y_0)
+subplot(5, 1, 2)
 plot(Y_1)
-title("Sampleplot      DC")
-xlabel("Samples")
-ylabel("Amplitude")
-subplot(2, 1, 2)
-semilogx(f_axis, abs(fft(Y_1))/N)
-xlim([0 fs/2])
-title("Frekvensrespons      DC")
-xlabel("Frekvens [Hz]")
-ylabel("Amplitude [dB]")
-
-figure()
-subplot(2, 1, 1)
+subplot(5, 1, 3)
 plot(Y_2)
-title("Sampleplot      DC & Lavpas")
-xlabel("Samples")
-ylabel("Amplitude")
-subplot(2, 1, 2)
-semilogx(f_axis, abs(fft(Y_2))/N)
-xlim([0 fs/2])
-title("Frekvensrespons      DC & Lavpass")
-xlabel("Frekvens [Hz]")
-ylabel("Amplitude [dB]")
-
-figure()
-subplot(2, 1, 1)
+subplot(5, 1, 4)
 plot(Y_3)
-title("Sampleplot      DC & Lavpas & Båndstop")
-xlabel("Samples")
-ylabel("Amplitude")
-subplot(2, 1, 2)
-semilogx(f_axis, abs(fft(Y_3))/N)
-xlim([0 fs/2])
-title("Frekvensrespons      DC & Lavpas & Båndstop")
-xlabel("Frekvens [Hz]")
-ylabel("Amplitude [dB]")
+subplot(5, 1, 5)
+plot(Y_4)
 
 figure()
-subplot(2, 1, 1)
-plot(Y_4)
-title("Sampleplot      DC & Lavpas & Båndstop & Højpas")
-xlabel("Samples")
-ylabel("Amplitude")
-subplot(2, 1, 2)
+subplot(5, 1, 1)
+semilogx(f_axis, abs(fft(Y_0))/N)
+subplot(5, 1, 2)
+semilogx(f_axis, abs(fft(Y_1))/N)
+subplot(5, 1, 3)
+semilogx(f_axis, abs(fft(Y_2))/N)
+subplot(5, 1, 4)
+semilogx(f_axis, abs(fft(Y_3))/N)
+subplot(5, 1, 5)
 semilogx(f_axis, abs(fft(Y_4))/N)
-xlim([0 fs/2])
-title("Frekvensrespons      DC & Lavpas & Båndstop & Højpas")
-xlabel("Frekvens [Hz]")
-ylabel("Amplitude [dB]")
 
 
 
