@@ -48,10 +48,8 @@ H_hi = [H_hi fliplr(H_hi)];
 h_hi = fftshift(real(ifft(H_hi)));
 figure()
 plot(h_hi)
-title("Impulsrespons")
-xlim([0 length(h_hi)])
-xlabel("Samples")
-ylabel("Amplitude")
+plot(h) % Blå er impulssrepsons uden vindue.
+axis([1 M-1 -inf inf])
 
 hanning_w_hi = hanning(length(h_hi))';
 h_hi = h_hi .* hanning_w_hi;
