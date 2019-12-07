@@ -4,7 +4,7 @@
 % udtager venstre kanal af stereosignalet og
 % laver søjleformatet om til rækkeformat
 y = y(:,1)';
-
+y_filtered = y;
 %% Filtre
 %Loaded from file: fs = 44100;     % Sampling frequency
 N   = 24;        % Order
@@ -20,6 +20,8 @@ gain6 = 1;
 gain7 = 1;
 gain8 = 1;
 
+% Save them in file
+save('gains.mat','gain1','gain2','gain3','gain4','gain5','gain6','gain7','gain8','-append')
 
 % Make the filters have a positive offset, so they overlap a bit
 freq_offset = 1;
@@ -96,7 +98,18 @@ fc8_2 = fs/2 - 1;       % Second Cutoff Frequency - Same as nyquist
 sos8 = zp2sos(z8, p8, k8);
 hz_sos8 = freqz(sos8,f_akse,fs);
 
-hz_sos_tot = hz_sos1 + hz_sos2 + hz_sos3 + hz_sos4 + hz_sos5 + hz_sos6 + hz_sos7 + hz_sos8;
+% Filtrer
+    y1 = sosfilt(sos1,y);
+    y2 = sosfilt(sos2,y);
+    y3 = sosfilt(sos3,y);
+    y4 = sosfilt(sos4,y);
+    y5 = sosfilt(sos5,y);
+    y6 = sosfilt(sos6,y);
+    y7 = sosfilt(sos7,y);
+    y8 = sosfilt(sos8,y);
+
+    y_filtered = y1+ y2 + y3 + y4 + y5 + y6 + y7 + y8;
+
 
 %% Mortens amazing GUI
 % Kør koden nedenfor. Indstil gainet i de forskellige bånd. Lad være med at
@@ -110,49 +123,49 @@ guioffset = (1080-840)/4;
 uilabel(fig,'Position',[840 950 300 40],'FontSize',32,'FontWeight','bold','Text','Amazing EQ GUI');
 panel1 = uipanel(fig,'Position',[460 770+guioffset 1000 110]);
 uilabel(fig,'Position',[875 850+guioffset 300 20],'FontSize',16,'FontWeight','bold','Text','20 Hz - 100 Hz bånd [dB]');
-band1 = uislider(fig,'Position',[510 820+guioffset 900 3], 'ValueChangingFcn',@(band1,event) bandfunc1(event, k1));
+band1 = uislider(fig,'Position',[510 820+guioffset 900 3], 'ValueChangingFcn',@(band1,event) bandfunc1(event));
 band1.Limits = [-18 18];
 band1.Value = 0;
 
 panel2 = uipanel(fig,'Position',[460 660+guioffset 1000 110]);
 uilabel(fig,'Position',[875 740+guioffset 300 20],'FontSize',16,'FontWeight','bold','Text','100 Hz - 200 Hz bånd [dB]');
-band2 = uislider(fig,'Position',[510 710+guioffset 900 3], 'ValueChangingFcn',@(band2,event) bandfunc2(event, k2));
+band2 = uislider(fig,'Position',[510 710+guioffset 900 3], 'ValueChangingFcn',@(band2,event) bandfunc2(event));
 band2.Limits = [-18 18];
 band2.Value = 0;
 
 panel3 = uipanel(fig,'Position',[460 550+guioffset 1000 110]);
 uilabel(fig,'Position',[875 630+guioffset 300 20],'FontSize',16,'FontWeight','bold','Text','200 Hz - 500 Hz bånd [dB]');
-band3 = uislider(fig,'Position',[510 600+guioffset 900 3], 'ValueChangingFcn',@(band3,event) bandfunc3(event, k3));
+band3 = uislider(fig,'Position',[510 600+guioffset 900 3], 'ValueChangingFcn',@(band3,event) bandfunc3(event));
 band3.Limits = [-18 18];
 band3.Value = 0;
 
 panel4 = uipanel(fig,'Position',[460 440+guioffset 1000 110]);
 uilabel(fig,'Position',[875 520+guioffset 300 20],'FontSize',16,'FontWeight','bold','Text','500 Hz - 1 kHz bånd [dB]');
-band4 = uislider(fig,'Position',[510 490+guioffset 900 3], 'ValueChangingFcn',@(band4,event) bandfunc4(event, k4));
+band4 = uislider(fig,'Position',[510 490+guioffset 900 3], 'ValueChangingFcn',@(band4,event) bandfunc4(event));
 band4.Limits = [-18 18];
 band4.Value = 0;
 
 panel5 = uipanel(fig,'Position',[460 330+guioffset 1000 110]);
 uilabel(fig,'Position',[875 410+guioffset 300 20],'FontSize',16,'FontWeight','bold','Text','1 kHz - 2 kHz bånd [dB]');
-band5 = uislider(fig,'Position',[510 380+guioffset 900 3],'ValueChangingFcn',@(band5,event) bandfunc5(event, k5));
+band5 = uislider(fig,'Position',[510 380+guioffset 900 3],'ValueChangingFcn',@(band5,event) bandfunc5(event));
 band5.Limits = [-18 18];
 band5.Value = 0;
 
 panel6 = uipanel(fig,'Position',[460 220+guioffset 1000 110]);
 uilabel(fig,'Position',[875 300+guioffset 300 20],'FontSize',16,'FontWeight','bold','Text','2 kHz - 5 kHz bånd [dB]');
-band6 = uislider(fig,'Position',[510 270+guioffset 900 3],'ValueChangingFcn',@(band6,event) bandfunc6(event, k6));
+band6 = uislider(fig,'Position',[510 270+guioffset 900 3],'ValueChangingFcn',@(band6,event) bandfunc6(event));
 band6.Limits = [-18 18];
 band6.Value = 0;
 
 panel7 = uipanel(fig,'Position',[460 110+guioffset 1000 110]);
 uilabel(fig,'Position',[875 190+guioffset 300 20],'FontSize',16,'FontWeight','bold','Text','5 kHz - 10 kHz bånd [dB]');
-band7 = uislider(fig,'Position',[510 160+guioffset 900 3],'ValueChangingFcn',@(band7,event) bandfunc7(event, k7));
+band7 = uislider(fig,'Position',[510 160+guioffset 900 3],'ValueChangingFcn',@(band7,event) bandfunc7(event));
 band7.Limits = [-18 18];
 band7.Value = 0;
 
 panel8 = uipanel(fig,'Position',[460 0+guioffset 1000 110]);
 uilabel(fig,'Position',[875 80+guioffset 300 20],'FontSize',16,'FontWeight','bold','Text','10 kHz - 20 kHz bånd [dB]');
-band8 = uislider(fig,'Position',[510 50+guioffset 900 3], 'ValueChangingFcn',@(band8,event) bandfunc8(event, k8));
+band8 = uislider(fig,'Position',[510 50+guioffset 900 3], 'ValueChangingFcn',@(band8,event) bandfunc8(event));
 band8.Limits = [-18 18];
 band8.Value = 0;
 
@@ -161,7 +174,7 @@ btn = uibutton(fig, 'Position', [1460 30+guioffset 100 22], 'Text', 'Plot filtre
 
 
 i = 1;
-while i < fs*5
+while i < length(y)
     soundsc(y_filtered(i:i+fs),fs);
     tic;
     load('gains');
@@ -191,48 +204,61 @@ while i < fs*5
     
     sos8 = zp2sos(z8, p8, gain8*k8);
     hz_sos8 = freqz(sos8,f_akse,fs);
+    
+    % Filtrer
+    y1 = sosfilt(sos1,y);
+    y2 = sosfilt(sos2,y);
+    y3 = sosfilt(sos3,y);
+    y4 = sosfilt(sos4,y);
+    y5 = sosfilt(sos5,y);
+    y6 = sosfilt(sos6,y);
+    y7 = sosfilt(sos7,y);
+    y8 = sosfilt(sos8,y);
+
+    y_filtered = y1+ y2 + y3 + y4 + y5 + y6 + y7 + y8;
     endtime = toc;
+    %display(['Done filtering in ' num2str(endtime) 's']);
     pause(1-endtime);
 end
 
 %% Functions
-function bandfunc1(event, gain1)
-   gain1 = gain1*10^(event.Value/20);
+function bandfunc1(event)
+   gain1 = 10^(event.Value/20);
    save('gains.mat','gain1','-append')
 end
 
-function bandfunc2(event, gain2)
-   gain2 = gain2*10^(event.Value/20);
+function bandfunc2(event)
+   gain2 = 10^(event.Value/20);
    save('gains.mat','gain2','-append')
 end
 
-function bandfunc3(event, gain3)
-   gain3 = gain3*10^(event.Value/20);
+function bandfunc3(event)
+   gain3 = 10^(event.Value/20);
    save('gains.mat','gain3','-append')
 end
 
-function bandfunc4(event, gain4)
-   gain4 = gain4*10^(event.Value/20);
+function bandfunc4(event)
+   gain4 = 10^(event.Value/20);
    save('gains.mat','gain4','-append')
 end
 
-function bandfunc5(event, gain5)
-   gain5 = gain5*10^(event.Value/20);
+function bandfunc5(event)
+   gain5 = 10^(event.Value/20);
    save('gains.mat','gain5','-append')
 end
 
-function bandfunc6(event, gain6)
-   gain6 = gain6*10^(event.Value/20);
+function bandfunc6(event)
+   gain6 = 10^(event.Value/20);
    save('gains.mat','gain6','-append')
 end
 
-function bandfunc7(event, gain7)
-   gain7 = gain7*10^(event.Value/20);
+function bandfunc7(event)
+   gain7 = 10^(event.Value/20);
    save('gains.mat','gain7','-append')
 end
 
-function bandfunc8(event, gain8)
-   gain8 = gain8*10^(event.Value/20);
+function bandfunc8(event)
+   gain8 = 10^(event.Value/20);
    save('gains.mat','gain8','-append')
 end
 
