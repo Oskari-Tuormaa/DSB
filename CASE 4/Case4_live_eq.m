@@ -169,15 +169,19 @@ band8 = uislider(fig,'Position',[510 50+guioffset 900 3], 'ValueChangingFcn',@(b
 band8.Limits = [-18 18];
 band8.Value = 0;
 
-btn = uibutton(fig, 'Position', [1460 30+guioffset 100 22], 'Text', 'Plot filtre','ButtonPushedFcn',...
-    @(btn,event) plotButton(f_akse, hz_sos1,hz_sos2,hz_sos3,hz_sos4,hz_sos5,hz_sos6,hz_sos7,hz_sos8,hz_sos_tot));
-
-
 i = 1;
+% set to length(y) for entire song
 while i < length(y)
-    soundsc(y_filtered(i:i+fs),fs);
+    % Check for out of bounds
+    if i+fs < length(y_filtered)
+        soundsc(y_filtered(i:i+fs),fs);
+    else
+        soundsc(y_filtered(i:end),fs);
+    end
+    % Start timer
     tic;
     load('gains');
+    % Increment i by 1 second
     i = i+fs;
     
     % Recalculate filters
@@ -187,11 +191,11 @@ while i < length(y)
     sos2 = zp2sos(z2, p2, gain2*k2);
     hz_sos2 = freqz(sos2,f_akse,fs);
     
-    sos3 = zp2sos(z3, p3, gain4*k3);
+    sos3 = zp2sos(z3, p3, gain3*k3);
     hz_sos3 = freqz(sos3,f_akse,fs);
     
     sos4 = zp2sos(z4, p4, gain4*k4);
-    hz_sos4 = freqz(sos7,f_akse,fs);
+    hz_sos4 = freqz(sos4,f_akse,fs);
     
     sos5 = zp2sos(z5, p5, gain5*k5);
     hz_sos5 = freqz(sos5,f_akse,fs);
@@ -204,8 +208,8 @@ while i < length(y)
     
     sos8 = zp2sos(z8, p8, gain8*k8);
     hz_sos8 = freqz(sos8,f_akse,fs);
-    
-    % Filtrer
+      
+    % Filter signal
     y1 = sosfilt(sos1,y);
     y2 = sosfilt(sos2,y);
     y3 = sosfilt(sos3,y);
@@ -214,14 +218,89 @@ while i < length(y)
     y6 = sosfilt(sos6,y);
     y7 = sosfilt(sos7,y);
     y8 = sosfilt(sos8,y);
-
+    
+    % Insert into the variable we play from
     y_filtered = y1+ y2 + y3 + y4 + y5 + y6 + y7 + y8;
+    % Stop timer and set number into endtime. Usually around 0,3 seconds
     endtime = toc;
     %display(['Done filtering in ' num2str(endtime) 's']);
     pause(1-endtime);
 end
 
-%% Functions
+%% Plot frekvenskarakteristik
+figure(1)
+semilogx(f_akse, 20*log10(abs(hz_sos1)), 'linewidth', 2);
+hold on
+semilogx(f_akse, 20*log10(abs(hz_sos2)), 'linewidth', 2);
+semilogx(f_akse, 20*log10(abs(hz_sos3)), 'linewidth', 2);
+semilogx(f_akse, 20*log10(abs(hz_sos4)), 'linewidth', 2);
+semilogx(f_akse, 20*log10(abs(hz_sos5)), 'linewidth', 2);
+semilogx(f_akse, 20*log10(abs(hz_sos6)), 'linewidth', 2);
+semilogx(f_akse, 20*log10(abs(hz_sos7)), 'linewidth', 2);
+semilogx(f_akse, 20*log10(abs(hz_sos8)), 'linewidth', 2);
+
+% Combined filter:
+hz_sos_tot = hz_sos1 + hz_sos2 + hz_sos3 + hz_sos4 + hz_sos5 + hz_sos6 + hz_sos7 + hz_sos8;
+semilogx(f_akse, 20*log10(abs(hz_sos_tot)), 'linewidth', 1, 'Color', 'black');
+hold off
+grid on
+ylim([-25 30]);
+ylabel('Gain dB');
+xlim([20 22000]);
+xlabel('Frekvens [Hz]')
+title('8 båndpas filtre');
+legend('Filter1 20-100Hz','Filter2 100-200Hz','Filter3 200-500Hz','Filter4 500-1000Hz','Filter5 1000-2000Hz','Filter6 2000-5000Hz','Filter7 5000-10000Hz','Filter8 10000-20000Hz', 'Samlet filter','NumColumns',3);
+
+%% Fasekarakteristik
+figure(2)
+plot(f_akse,180/pi*unwrap(angle(hz_sos8)));
+hold on
+plot(f_akse,180/pi*unwrap(angle(hz_sos7)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos6)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos5)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos4)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos3)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos2)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos1)));
+hold off
+%xlim([0 max(f_akse)/2]);
+
+%% Signalanalyse af sangen
+Y_filtered = fft(y_filtered);
+Y = fft(y);
+
+figure(3);
+subplot(2,1,1);
+logabsY = 20*log10(abs(1/N*Y(1:0.5*fs))); 
+semilogx(logabsY,'b');
+grid on
+xlabel('Frekvens [Hz]');
+ylabel('Amplitude [dB relateret til 1]');
+subplot(2,1,2);
+logabsY_tot = 20*log10(abs(1/N*Y_filtered(1:0.5*fs))); 
+semilogx(logabsY_tot,'b');
+grid on
+xlabel('Frekvens [Hz]');
+ylabel('Amplitude [dB relateret til 1]');
+
+%% Impulsrespons
+impuls = [1 zeros(1,999)];
+
+k2 = sosfilt(sos2,impuls);
+k7 = sosfilt(sos7,impuls);
+figure(4)
+plot(k2);
+hold on
+grid on
+plot(k7);
+ylim([-0.2 0.2]);
+ylabel('Gain');
+xlabel('Samples');
+hold off
+title('Impulsrespons for filter');
+legend('Filter2 100-200Hz','Filter7 5000-10000Hz');
+
+%% Functions must be at end of document
 function bandfunc1(event)
    gain1 = 10^(event.Value/20);
    save('gains.mat','gain1','-append')
@@ -260,30 +339,4 @@ end
 function bandfunc8(event)
    gain8 = 10^(event.Value/20);
    save('gains.mat','gain8','-append')
-end
-
-function plotButton(f_akse, hz_sos1,hz_sos2,hz_sos3,hz_sos4,hz_sos5,hz_sos6,hz_sos7,hz_sos8,hz_sos_tot)
-    docfig = figure(1);
-    docfig.WindowState = 'maximized';
-    semilogx(f_akse, 20*log10(abs(hz_sos1)), 'linewidth', 2);
-    hold on
-    semilogx(f_akse, 20*log10(abs(hz_sos2)), 'linewidth', 2);
-    semilogx(f_akse, 20*log10(abs(hz_sos3)), 'linewidth', 2);
-    semilogx(f_akse, 20*log10(abs(hz_sos4)), 'linewidth', 2);
-    semilogx(f_akse, 20*log10(abs(hz_sos5)), 'linewidth', 2);
-    semilogx(f_akse, 20*log10(abs(hz_sos6)), 'linewidth', 2);
-    semilogx(f_akse, 20*log10(abs(hz_sos7)), 'linewidth', 2);
-    semilogx(f_akse, 20*log10(abs(hz_sos8)), 'linewidth', 2);
-
-    % Combined filter:
-    semilogx(f_akse, 20*log10(abs(hz_sos_tot)), 'linewidth', 1, 'Color', 'black');
-    hold off
-    grid on
-    ylim([-25 30]);
-    ylabel('Gain');
-    xlim([20 20000]);
-    xlabel('Frekvens [Hz]')
-    title('8 båndpas filtre');
-    legend('Filter1 20-100Hz','Filter2 100-200Hz','Filter3 200-500Hz','Filter4 500-1000Hz','Filter5 1000-2000Hz','Filter6 2000-5000Hz','Filter7 5000-10000Hz','Filter8 10000-20000Hz', 'Samlet filter','NumColumns',3);
-   
 end
