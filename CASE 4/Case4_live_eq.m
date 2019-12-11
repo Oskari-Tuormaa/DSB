@@ -312,11 +312,9 @@ title('Impulsrespons');
 legend('Impulsrespons for samlet filter');
 
 %%
-%[gd, f_akse2] = grpdelay(hz_sos_tot, 1:1:fs/2, fs)
-
-%figure(5)
-%plot(f_akse2, gd)
-%title("Group delay")
+figure(5)
+grpdelay(hz_sos_tot)
+title("Group Delay")
 
 %% Functions must be at end of document
 function bandfunc1(event)
