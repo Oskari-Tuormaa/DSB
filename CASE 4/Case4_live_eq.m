@@ -35,7 +35,7 @@ freq_offset1 = 1.075;
 fc1_1 = 20;       % First Cutoff Frequency
 fc1_2 = 100*freq_offset1;       % Second Cutoff Frequency
 %[z1, p1, k1] = butter(N/2,[fc1_1 fc1_2]/(fs/2),'bandpass');
-[z1, p1, imp_resp1] = cheby2(N/2,40,[fc1_1 fc1_2]/(fs/2),'bandpass');
+[z1, p1, k1] = cheby2(N/2,40,[fc1_1 fc1_2]/(fs/2),'bandpass');
 
 
 % Filter 2: 100-200
@@ -43,50 +43,49 @@ freq_offset2 = 1.06;
 fc2_1 = 100;       % First Cutoff Frequency
 fc2_2 = 200*freq_offset2;       % Second Cutoff Frequency
 %[z2, p2, k2] = butter(N/2,[fc2_1 fc2_2]/(fs/2),'bandpass');
-[z2, p2, imp_resp2] = cheby2(N/2,40,[fc2_1 fc2_2]/(fs/2),'bandpass');
+[z2, p2, k2] = cheby2(N/2,40,[fc2_1 fc2_2]/(fs/2),'bandpass');
 
 % Filter 3: 200-500
 freq_offset3 = 1.06;
 fc3_1 = 200;       % First Cutoff Frequency
 fc3_2 = 500*freq_offset3;       % Second Cutoff Frequency
 %[z3,p3,k3] = butter(N/2,[fc3_1 fc3_2]/(fs/2),'bandpass');
-[z3,p3,imp_resp3] = cheby2(N/2,40,[fc3_1 fc3_2]/(fs/2),'bandpass');
+[z3,p3,k3] = cheby2(N/2,40,[fc3_1 fc3_2]/(fs/2),'bandpass');
 
 % Filter 4: 500-1000
 freq_offset4 = 1.055;
 fc4_1 = 500;       % First Cutoff Frequency
 fc4_2 = 1000*freq_offset4;       % Second Cutoff Frequency
 %[z4,p4,k4] = butter(N/2,[fc4_1 fc4_2]/(fs/2),'bandpass');
-[z4,p4,imp_resp4] = cheby2(N/2,40,[fc4_1 fc4_2]/(fs/2),'bandpass');
+[z4,p4,k4] = cheby2(N/2,40,[fc4_1 fc4_2]/(fs/2),'bandpass');
 
 % Filter 5: 1000-2000
 freq_offset5 = 1.063;
 fc5_1 = 1000;       % First Cutoff Frequency
 fc5_2 = 2000*freq_offset5;       % Second Cutoff Frequency
 %[z5,p5,k5] = butter(N/2,[fc5_1 fc5_2]/(fs/2),'bandpass');
-[z5,p5,imp_resp5] = cheby2(N/2,40,[fc5_1 fc5_2]/(fs/2),'bandpass');
+[z5,p5,k5] = cheby2(N/2,40,[fc5_1 fc5_2]/(fs/2),'bandpass');
 
 % Filter 6: 2000-5000
 freq_offset6 = 1.062;
 fc6_1 = 2000;       % First Cutoff Frequency
 fc6_2 = 5000*freq_offset6;       % Second Cutoff Frequency
 %[z6,p6,k6] = butter(N/2,[fc6_1 fc6_2]/(fs/2),'bandpass');
-[z6,p6,imp_resp6] = cheby2(N/2,40,[fc6_1 fc6_2]/(fs/2),'bandpass');
+[z6,p6,k6] = cheby2(N/2,40,[fc6_1 fc6_2]/(fs/2),'bandpass');
 
 % Filter 7: 5000-10000
 freq_offset7 = 1.07;
 fc7_1 = 5000;       % First Cutoff Frequency
 fc7_2 = 10000*freq_offset7;       % Second Cutoff Frequency
 %[z7,p7,k7] = butter(N/2,[fc7_1 fc7_2]/(fs/2),'bandpass');
-[z7,p7,imp_resp7] = cheby2(N/2,40,[fc7_1 fc7_2]/(fs/2),'bandpass');
+[z7,p7,k7] = cheby2(N/2,40,[fc7_1 fc7_2]/(fs/2),'bandpass');
 
 
-% Filter 8: 10000-22050
+% Filter 8: 10000-20000
 fc8_1 = 10000;       % First Cutoff Frequency
-fc8_2 = fs/2 - 1;       % Second Cutoff Frequency - Same as nyquist
+fc8_2 = 20000;       % Second Cutoff Frequency
 %[z8,p8,k8] = butter(N/2,[fc8_1 fc8_2]/(fs/2),'bandpass');
 [z8,p8,k8] = cheby2(N/2,40,[fc8_1 fc8_2]/(fs/2),'bandpass');
-
 
 
 %% Mortens amazing GUI
@@ -169,13 +168,13 @@ while i < length(y)
     end
       
     % Recalculate filters1
-    sos1 = zp2sos(z1, p1, gain1*imp_resp1);
-    sos2 = zp2sos(z2, p2, gain2*imp_resp2); 
-    sos3 = zp2sos(z3, p3, gain3*imp_resp3);
-    sos4 = zp2sos(z4, p4, gain4*imp_resp4);
-    sos5 = zp2sos(z5, p5, gain5*imp_resp5);
-    sos6 = zp2sos(z6, p6, gain6*imp_resp6);
-    sos7 = zp2sos(z7, p7, gain7*imp_resp7);
+    sos1 = zp2sos(z1, p1, gain1*k1);
+    sos2 = zp2sos(z2, p2, gain2*k2); 
+    sos3 = zp2sos(z3, p3, gain3*k3);
+    sos4 = zp2sos(z4, p4, gain4*k4);
+    sos5 = zp2sos(z5, p5, gain5*k5);
+    sos6 = zp2sos(z6, p6, gain6*k6);
+    sos7 = zp2sos(z7, p7, gain7*k7);
     sos8 = zp2sos(z8, p8, gain8*k8);
       
     % Filter signal
@@ -238,10 +237,10 @@ hold off
 grid on
 ylim([-25 30]);
 ylabel('Gain dB');
-xlim([20 22050]);
+xlim([20 20000]);
 xlabel('Frekvens [Hz]')
 title('8 båndpas filtre');
-legend('Filter1 20-100Hz','Filter2 100-200Hz','Filter3 200-500Hz','Filter4 500-1000Hz','Filter5 1000-2000Hz','Filter6 2000-5000Hz','Filter7 5000-10000Hz','Filter8 10000-22050Hz', 'Samlet filter','NumColumns',3);
+legend('Filter1 20-100Hz','Filter2 100-200Hz','Filter3 200-500Hz','Filter4 500-1000Hz','Filter5 1000-2000Hz','Filter6 2000-5000Hz','Filter7 5000-10000Hz','Filter8 10000-20000Hz', 'Samlet filter','NumColumns',3);
 
 %% Fasekarakteristik
     % Weird phase characteristic because we are now using chebychev filters
@@ -269,19 +268,23 @@ Y = fft(y);
 
 figure(3);
 subplot(2,1,1);
-title('Originalt signal');
 logabsY = 20*log10(abs(1/N*Y(1:0.5*fs))); 
 semilogx(logabsY,'b');
+title('Originalt signal');
 grid on
 xlabel('Frekvens [Hz]');
 ylabel('Amplitude [dB relateret til 1]');
+ylim([-80 40])
+xlim([1 20000])
 subplot(2,1,2);
-title('Filtreret signal efter sidste ændring i filtre');
 logabsY_tot = 20*log10(abs(1/N*Y_filtered(1:0.5*fs))); 
 semilogx(logabsY_tot,'b');
+title('Filtreret signal efter sidste ændring i filtre');
 grid on
 xlabel('Frekvens [Hz]');
 ylabel('Amplitude [dB relateret til 1]');
+ylim([-80 40])
+xlim([1 20000])
 
 %% Impulsrespons
 impuls = [1 zeros(1,length(y)-1)];
@@ -307,6 +310,13 @@ xlabel('Samples');
 hold off
 title('Impulsrespons');
 legend('Impulsrespons for samlet filter');
+
+%%
+%[gd, f_akse2] = grpdelay(hz_sos_tot, 1:1:fs/2, fs)
+
+%figure(5)
+%plot(f_akse2, gd)
+%title("Group delay")
 
 %% Functions must be at end of document
 function bandfunc1(event)
