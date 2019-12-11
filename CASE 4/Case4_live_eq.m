@@ -35,7 +35,7 @@ freq_offset1 = 1.075;
 fc1_1 = 20;       % First Cutoff Frequency
 fc1_2 = 100*freq_offset1;       % Second Cutoff Frequency
 %[z1, p1, k1] = butter(N/2,[fc1_1 fc1_2]/(fs/2),'bandpass');
-[z1, p1, k1] = cheby2(N/2,40,[fc1_1 fc1_2]/(fs/2),'bandpass');
+[z1, p1, imp_resp1] = cheby2(N/2,40,[fc1_1 fc1_2]/(fs/2),'bandpass');
 
 
 % Filter 2: 100-200
@@ -43,42 +43,42 @@ freq_offset2 = 1.06;
 fc2_1 = 100;       % First Cutoff Frequency
 fc2_2 = 200*freq_offset2;       % Second Cutoff Frequency
 %[z2, p2, k2] = butter(N/2,[fc2_1 fc2_2]/(fs/2),'bandpass');
-[z2, p2, k2] = cheby2(N/2,40,[fc2_1 fc2_2]/(fs/2),'bandpass');
+[z2, p2, imp_resp2] = cheby2(N/2,40,[fc2_1 fc2_2]/(fs/2),'bandpass');
 
 % Filter 3: 200-500
 freq_offset3 = 1.06;
 fc3_1 = 200;       % First Cutoff Frequency
 fc3_2 = 500*freq_offset3;       % Second Cutoff Frequency
 %[z3,p3,k3] = butter(N/2,[fc3_1 fc3_2]/(fs/2),'bandpass');
-[z3,p3,k3] = cheby2(N/2,40,[fc3_1 fc3_2]/(fs/2),'bandpass');
+[z3,p3,imp_resp3] = cheby2(N/2,40,[fc3_1 fc3_2]/(fs/2),'bandpass');
 
 % Filter 4: 500-1000
 freq_offset4 = 1.055;
 fc4_1 = 500;       % First Cutoff Frequency
 fc4_2 = 1000*freq_offset4;       % Second Cutoff Frequency
 %[z4,p4,k4] = butter(N/2,[fc4_1 fc4_2]/(fs/2),'bandpass');
-[z4,p4,k4] = cheby2(N/2,40,[fc4_1 fc4_2]/(fs/2),'bandpass');
+[z4,p4,imp_resp4] = cheby2(N/2,40,[fc4_1 fc4_2]/(fs/2),'bandpass');
 
 % Filter 5: 1000-2000
 freq_offset5 = 1.063;
 fc5_1 = 1000;       % First Cutoff Frequency
 fc5_2 = 2000*freq_offset5;       % Second Cutoff Frequency
 %[z5,p5,k5] = butter(N/2,[fc5_1 fc5_2]/(fs/2),'bandpass');
-[z5,p5,k5] = cheby2(N/2,40,[fc5_1 fc5_2]/(fs/2),'bandpass');
+[z5,p5,imp_resp5] = cheby2(N/2,40,[fc5_1 fc5_2]/(fs/2),'bandpass');
 
 % Filter 6: 2000-5000
 freq_offset6 = 1.062;
 fc6_1 = 2000;       % First Cutoff Frequency
 fc6_2 = 5000*freq_offset6;       % Second Cutoff Frequency
 %[z6,p6,k6] = butter(N/2,[fc6_1 fc6_2]/(fs/2),'bandpass');
-[z6,p6,k6] = cheby2(N/2,40,[fc6_1 fc6_2]/(fs/2),'bandpass');
+[z6,p6,imp_resp6] = cheby2(N/2,40,[fc6_1 fc6_2]/(fs/2),'bandpass');
 
 % Filter 7: 5000-10000
 freq_offset7 = 1.07;
 fc7_1 = 5000;       % First Cutoff Frequency
 fc7_2 = 10000*freq_offset7;       % Second Cutoff Frequency
 %[z7,p7,k7] = butter(N/2,[fc7_1 fc7_2]/(fs/2),'bandpass');
-[z7,p7,k7] = cheby2(N/2,40,[fc7_1 fc7_2]/(fs/2),'bandpass');
+[z7,p7,imp_resp7] = cheby2(N/2,40,[fc7_1 fc7_2]/(fs/2),'bandpass');
 
 
 % Filter 8: 10000-22050
@@ -154,7 +154,7 @@ i = i+fs;
 while i < length(y)
     % Start timer
     tic;
-    soundsc(y_filtered,fs);
+    sound(y_filtered,fs);
     % Load the gains
     load('gains');
     
@@ -169,13 +169,13 @@ while i < length(y)
     end
       
     % Recalculate filters1
-    sos1 = zp2sos(z1, p1, gain1*k1);
-    sos2 = zp2sos(z2, p2, gain2*k2); 
-    sos3 = zp2sos(z3, p3, gain3*k3);
-    sos4 = zp2sos(z4, p4, gain4*k4);
-    sos5 = zp2sos(z5, p5, gain5*k5);
-    sos6 = zp2sos(z6, p6, gain6*k6);
-    sos7 = zp2sos(z7, p7, gain7*k7);
+    sos1 = zp2sos(z1, p1, gain1*imp_resp1);
+    sos2 = zp2sos(z2, p2, gain2*imp_resp2); 
+    sos3 = zp2sos(z3, p3, gain3*imp_resp3);
+    sos4 = zp2sos(z4, p4, gain4*imp_resp4);
+    sos5 = zp2sos(z5, p5, gain5*imp_resp5);
+    sos6 = zp2sos(z6, p6, gain6*imp_resp6);
+    sos7 = zp2sos(z7, p7, gain7*imp_resp7);
     sos8 = zp2sos(z8, p8, gain8*k8);
       
     % Filter signal
@@ -192,7 +192,7 @@ while i < length(y)
     y_filtered = y1+ y2 + y3 + y4 + y5 + y6 + y7 + y8;
     % Stop timer and set number into endtime. Usually around 0,05 seconds
     endtime = toc;
-    display(['Done filtering in ' num2str(endtime) 's']);
+    %display(['Done filtering in ' num2str(endtime) 's']);
     pause(1-endtime);
 end
 
@@ -248,14 +248,14 @@ legend('Filter1 20-100Hz','Filter2 100-200Hz','Filter3 200-500Hz','Filter4 500-1
     % instead.
 
 figure(2)
-%plot(f_akse,180/pi*unwrap(angle(hz_sos8)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos8)));
 hold on
-%plot(f_akse,180/pi*unwrap(angle(hz_sos7)));
-%plot(f_akse,180/pi*unwrap(angle(hz_sos6)));
-%plot(f_akse,180/pi*unwrap(angle(hz_sos5)));
-%plot(f_akse,180/pi*unwrap(angle(hz_sos4)));
-%plot(f_akse,180/pi*unwrap(angle(hz_sos3)));
-%plot(f_akse,180/pi*unwrap(angle(hz_sos2)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos7)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos6)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos5)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos4)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos3)));
+plot(f_akse,180/pi*unwrap(angle(hz_sos2)));
 plot(f_akse,180/pi*unwrap(angle(hz_sos1)));
 hold off
 xlim([0 max(f_akse)*0.5]);
@@ -284,21 +284,29 @@ xlabel('Frekvens [Hz]');
 ylabel('Amplitude [dB relateret til 1]');
 
 %% Impulsrespons
-impuls = [1 zeros(1,999)];
+impuls = [1 zeros(1,length(y)-1)];
 
-k2 = sosfilt(sos2,impuls);
-k7 = sosfilt(sos7,impuls);
+imp_resp1 = sosfilt(sos1,impuls);
+imp_resp2 = sosfilt(sos2,impuls);
+imp_resp3 = sosfilt(sos3,impuls);
+imp_resp4 = sosfilt(sos4,impuls);
+imp_resp5 = sosfilt(sos5,impuls);
+imp_resp6 = sosfilt(sos6,impuls);
+imp_resp7 = sosfilt(sos7,impuls);
+imp_resp8 = sosfilt(sos8,impuls);
+
+imp_resptot = imp_resp1+imp_resp2+imp_resp3+imp_resp4+imp_resp5+imp_resp6+imp_resp7+imp_resp8;
+
 figure(4)
-plot(k2);
+plot(imp_resptot);
 hold on
 grid on
-plot(k7);
-ylim([-0.2 0.2]);
+xlim([0 2000]);
 ylabel('Værdi');
 xlabel('Samples');
 hold off
-title('Impulsrespons for filter');
-legend('Filter2 100-200Hz','Filter7 5000-10000Hz');
+title('Impulsrespons');
+legend('Impulsrespons for samlet filter');
 
 %% Functions must be at end of document
 function bandfunc1(event)
